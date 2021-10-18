@@ -1,10 +1,9 @@
 const arenas = document.querySelector(".arenas");
-const randomButton = document.querySelector('.button')
+const randomButton = document.querySelector(".button");
 
-function getRandom (number) {
+function getRandom(number) {
   return Math.ceil(Math.random() * number);
 }
-
 
 const player1 = {
   player: 1,
@@ -15,6 +14,9 @@ const player1 = {
   attack: function () {
     console.log("this.name" + "fight!");
   },
+  changeHP: changeHP,
+  elHP: elHP,
+  renderHP: renderHP,
 };
 
 const player2 = {
@@ -26,6 +28,9 @@ const player2 = {
   attack: function () {
     console.log("this.name" + "fight!");
   },
+  changeHP: changeHP,
+  elHP: elHP,
+  renderHP: renderHP,
 };
 
 function createNewElement(tag, className) {
@@ -39,7 +44,7 @@ function createNewElement(tag, className) {
 }
 
 function createPlayer(fighter) {
-  const player = createNewElement("div", 'player' + fighter.player);
+  const player = createNewElement("div", "player" + fighter.player);
   const progressBar = createNewElement("div", "progressbar");
   const character = createNewElement("div", "character");
   const life = createNewElement("div", "life");
@@ -56,21 +61,23 @@ function createPlayer(fighter) {
   progressBar.appendChild(name);
   character.appendChild(img);
 
-  return player
+  return player;
 }
 
+function changeHP(amount) {
+  this.hp -= amount;
 
-function changeHP(player) {
-
-  const playerLife = document.querySelector(".player" + player.player + " .life");
-  player.hp -= getRandom(20);
-
-
-  if (player.hp <= 0) {
-    player.hp = 0
+  if (this.hp <= 0) {
+    this.hp = 0;
   }
+}
 
-  playerLife.style.width = player.hp + "%";
+function elHP() {
+  return document.querySelector(".player" + this.player + " .life");
+}
+
+function renderHP() {
+  this.elHP().style.width = this.hp + "%";
 }
 
 function showResult(name) {
@@ -83,13 +90,16 @@ function showResult(name) {
   return winTitle;
 }
 
-randomButton.addEventListener('click', function () {
-  console.log('click happen')
-  changeHP(player1)
-  changeHP(player2);
+randomButton.addEventListener("click", function () {
+  console.log("click happen");
+  player1.changeHP(getRandom(20));
+  player2.changeHP(getRandom(20));
+
+  player1.renderHP();
+  player2.renderHP();
 
   if (player1.hp === 0 || player2.hp === 0) {
-    randomButton.disabled = true
+    randomButton.disabled = true;
   }
 
   if (player1.hp === 0 && player1.hp < player2.hp) {
@@ -97,11 +107,9 @@ randomButton.addEventListener('click', function () {
   } else if (player2.hp === 0 && player2.hp < player1.hp) {
     arenas.appendChild(showResult(player1.name));
   } else if (player2.hp === 0 && player1.hp === 0) {
-    arenas.appendChild(showResult())
+    arenas.appendChild(showResult());
   }
-})
+});
 
-arenas.appendChild(createPlayer(player1))
+arenas.appendChild(createPlayer(player1));
 arenas.appendChild(createPlayer(player2));
-
-
