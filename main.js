@@ -90,6 +90,10 @@ function showResult(name) {
   return winTitle;
 }
 
+function createReloadButton () {
+
+}
+
 randomButton.addEventListener("click", function () {
   console.log("click happen");
   player1.changeHP(getRandom(20));
