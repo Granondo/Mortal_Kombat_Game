@@ -137,36 +137,59 @@ function createReloadButton() {
 arenas.appendChild(createPlayer(player1));
 arenas.appendChild(createPlayer(player2));
 
-function enemyAttack () {
-  const hit = ATTACK[getRandom(3) - 1]
+function enemyAttack() {
+  const hit = ATTACK[getRandom(3) - 1];
   const defence = ATTACK[getRandom(3) - 1];
-  console.log('hit', hit)
+  console.log("hit", hit);
   console.log("defence", defence);
 
   return {
     value: getRandom(HIT[hit]),
     hit,
-    defence
-  }
+    defence,
+  };
 }
 
-formFight.addEventListener('submit', function(event) {
-  event.preventDefault()
-  console.dir(formFight)
-  const enemy = enemyAttack()
+formFight.addEventListener("submit", function (event) {
+  event.preventDefault();
+  console.dir(formFight);
+  const enemy = enemyAttack();
 
-  const attack = {}
+  const attack = {};
   for (let item of formFight) {
-    if (item.checked && item.name === 'hit') {
-      attack.value = getRandom(HIT[item.value])
-      attack.hit = item.value
+    console.dir(item);
+
+    if (item.checked && item.name === "hit") {
+      attack.value = getRandom(HIT[item.value]);
+      attack.hit = item.value;
     }
 
-    if (item.checked && item.name === 'defence') {
-      attack.defence = item.value
+    if (item.checked && item.name === "defence") {
+      attack.defence = item.value;
     }
 
-    item.checked = false
+    // item.checked = false;
   }
-  console.log('attack', attack);
-})
+
+  player1.changeHP(attack.value);
+  player2.changeHP(enemy.value);
+
+  player1.renderHP();
+  player2.renderHP();
+
+    if (player1.hp === 0 || player2.hp === 0) {
+    formFight[6].disabled = true;
+    createReloadButton()
+  }
+
+  if (player1.hp === 0 && player1.hp < player2.hp) {
+    arenas.appendChild(showResult(player2.name));
+  } else if (player2.hp === 0 && player2.hp < player1.hp) {
+    arenas.appendChild(showResult(player1.name));
+  } else if (player2.hp === 0 && player1.hp === 0) {
+    arenas.appendChild(showResult());
+  }
+
+  console.log("attack", attack);
+  console.log("enemy", enemy);
+});
