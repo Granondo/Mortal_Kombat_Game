@@ -1,5 +1,8 @@
+import logs from "./log.js";
+
 const arenas = document.querySelector(".arenas");
 const formFight = document.querySelector(".control");
+const chat = document.querySelector(".chat");
 // const randomButton = document.querySelector(".button");
 
 const HIT = {
@@ -183,7 +186,46 @@ function showWhoIsWin() {
   }
 }
 
+function startTime() {
+  const date = new Date();
+  const normalize = (number) =>
+    number.toString().length > 1 ? number : `0{number}`;
+  const time = `${normalize(date.getHours())} : ${normalize(
+    date.getMinutes()
+  )} : ${normalize(date.getSeconds())}`;
+  const start = logs.start
+    .replace("[time]", time)
+    .replace("[player1]", player1.name)
+    .replace("[player2]", player2.name);
+
+   chat.insertAdjacentHTML("afterbegin", start);
+}
+
+function generateLogs(type, player1, player2) {
+  const attack = logs[type][getRandom(18)]
+    .replace("[playerKick]", player1.name)
+    .replace("[playerDefence]", player2.name);
+
+  const defense = logs[type][getRandom(8)]
+  .replace("[playerKick]", player1.name)
+  .replace("[playerDefence]", player2.name);
+
+  switch (type) {
+    case "hit":
+      const element = `<p>${attack}</p>`;
+      chat.insertAdjacentHTML("afterbegin", element);
+
+    case 'defence':
+      const element2 = `<p>${defense}</p>`;
+      chat.insertAdjacentHTML("afterbegin", element2);
+
+  }
+
+}
+
 formFight.addEventListener("submit", function (event) {
+
+
   event.preventDefault();
   console.dir(formFight);
   const enemy = enemyAttack();
@@ -192,11 +234,13 @@ formFight.addEventListener("submit", function (event) {
   if (player.defence !== enemy.hit) {
     player1.changeHP(enemy.value);
     player1.renderHP();
+    generateLogs("hit", player2, player1);
   }
 
   if (enemy.defence !== player.hit) {
     player2.changeHP(player.value);
     player2.renderHP();
+    generateLogs("hit", player1, player2);
   }
 
   showWhoIsWin();
