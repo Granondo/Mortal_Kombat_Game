@@ -1,5 +1,8 @@
+import logs from "./log.js";
+
 const arenas = document.querySelector(".arenas");
 const formFight = document.querySelector(".control");
+const chat = document.querySelector(".chat");
 // const randomButton = document.querySelector(".button");
 
 const HIT = {
@@ -8,6 +11,11 @@ const HIT = {
   foot: 20,
 };
 const ATTACK = ["head", "body", "foot"];
+
+const date = new Date();
+const normalize = (number) =>
+  number.toString().length > 1 ? number : `0{number}`;
+const time = `${normalize(date.getHours())} : ${normalize(date.getMinutes())}`;
 
 function getRandom(number) {
   return Math.ceil(Math.random() * number);
@@ -88,7 +96,7 @@ function renderHP() {
   this.elHP().style.width = this.hp + "%";
 }
 
-function showResult(name) {
+const showResult = (name) => {
   const winTitle = createNewElement("div", "loseTitle");
   if (name) {
     winTitle.innerText = name + " win!";
@@ -96,9 +104,9 @@ function showResult(name) {
     winTitle.innerText = "Draw";
   }
   return winTitle;
-}
+};
 
-function createReloadButton() {
+const createReloadButton = () => {
   const reloadButtonDiv = createNewElement("div", "reloadWrap");
   const reloadButton = createNewElement("button", "button");
 
@@ -110,7 +118,7 @@ function createReloadButton() {
 
   reloadButtonDiv.appendChild(reloadButton);
   arenas.appendChild(reloadButtonDiv);
-}
+};
 
 // randomButton.addEventListener("click", function () {
 //   console.log("click happen");
@@ -137,20 +145,18 @@ function createReloadButton() {
 arenas.appendChild(createPlayer(player1));
 arenas.appendChild(createPlayer(player2));
 
-function enemyAttack() {
+const enemyAttack = () => {
   const hit = ATTACK[getRandom(3) - 1];
   const defence = ATTACK[getRandom(3) - 1];
-  console.log("hit", hit);
-  console.log("defence", defence);
 
   return {
     value: getRandom(HIT[hit]),
     hit,
     defence,
   };
-}
+};
 
-function playerAttack() {
+const playerAttack = () => {
   const attack = {};
   for (let item of formFight) {
     if (item.checked && item.name === "hit") {
@@ -166,9 +172,49 @@ function playerAttack() {
   }
 
   return attack;
-}
+};
 
-function showWhoIsWin() {
+const generateLogs = (type, player1, player2, damage, currentHP) => {
+  let text = logs[type];
+
+  switch (type) {
+    case "start":
+      text = text
+        .replace("[time]", time)
+        .replace("[player1]", player1.name)
+        .replace("[player2]", player2.name);
+      break;
+    case "hit":
+      console.log(text.length)
+      text = text[getRandom(text.length - 1)]
+        .replace("[playerKick]", player1.name)
+        .replace("[playerDefence]", player2.name);
+      text = `${time} | ${text} -${damage} [${currentHP}/100]`;
+      break;
+    case "defence":
+      text = text[getRandom(text.length - 1)]
+        .replace("[playerKick]", player1.name)
+        .replace("[playerDefence]", player2.name);
+      break;
+    case "draw":
+      text = `${time} | ${text}`;
+      break;
+    case "end":
+      text = text[getRandom(text.length - 1)]
+        .replace("[playerWins]", player1.name)
+        .replace("[playerLose]", player2.name);
+      text = `${time} | ${text}`;
+      break;
+    default:
+      text = "Игра была равна, играли два...";
+      break;
+  }
+
+  const element = `<p>${text}</p>`;
+  chat.insertAdjacentHTML("afterbegin", element);
+};
+
+const showWhoIsWin = () => {
   if (player1.hp === 0 || player2.hp === 0) {
     formFight.style.method = "none";
     createReloadButton();
@@ -176,12 +222,15 @@ function showWhoIsWin() {
 
   if (player1.hp === 0 && player1.hp < player2.hp) {
     arenas.appendChild(showResult(player2.name));
+    generateLogs("end", player1.name, player2.name);
   } else if (player2.hp === 0 && player2.hp < player1.hp) {
     arenas.appendChild(showResult(player1.name));
+    generateLogs("end", player2.name, player1.name);
   } else if (player2.hp === 0 && player1.hp === 0) {
     arenas.appendChild(showResult());
+    generateLogs("draw");
   }
-}
+};
 
 formFight.addEventListener("submit", function (event) {
   event.preventDefault();
@@ -192,11 +241,17 @@ formFight.addEventListener("submit", function (event) {
   if (player.defence !== enemy.hit) {
     player1.changeHP(enemy.value);
     player1.renderHP();
+    generateLogs("hit", player2, player1, enemy.value, player1.hp);
+  } else {
+    generateLogs("defense", player2, player1, enemy.value);
   }
 
   if (enemy.defence !== player.hit) {
     player2.changeHP(player.value);
     player2.renderHP();
+    generateLogs("hit", player1, player2, enemy.value, player2.hp);
+  } else {
+    generateLogs("defense", player1, player2, enemy.value);
   }
 
   showWhoIsWin();
