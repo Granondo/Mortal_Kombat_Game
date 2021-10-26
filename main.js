@@ -1,8 +1,11 @@
-import logs from "./log.js";
+
+import {player1, player2} from './players.js'
+import {generateLogs} from './generateLogs.js'
+import { getRandom } from './getRandom.js';
 
 const arenas = document.querySelector(".arenas");
 const formFight = document.querySelector(".control");
-const chat = document.querySelector(".chat");
+export const chat = document.querySelector(".chat");
 // const randomButton = document.querySelector(".button");
 
 const HIT = {
@@ -12,42 +15,6 @@ const HIT = {
 };
 const ATTACK = ["head", "body", "foot"];
 
-const date = new Date();
-const normalize = (number) =>
-  number.toString().length > 1 ? number : `0{number}`;
-const time = `${normalize(date.getHours())} : ${normalize(date.getMinutes())}`;
-
-function getRandom(number) {
-  return Math.ceil(Math.random() * number);
-}
-
-const player1 = {
-  player: 1,
-  name: "LiuKang",
-  hp: 100,
-  img: "http://reactmarathon-api.herokuapp.com/assets/liukang.gif",
-  weapon: ["fist"],
-  attack,
-  changeHP,
-  elHP,
-  renderHP,
-};
-
-const player2 = {
-  player: 2,
-  name: "SubZero",
-  hp: 110,
-  img: "http://reactmarathon-api.herokuapp.com/assets/subzero.gif",
-  weapon: ["wrench"],
-  attack,
-  changeHP,
-  elHP,
-  renderHP,
-};
-
-function attack() {
-  console.log("this.name" + " fight!");
-}
 
 function createNewElement(tag, className) {
   const newTag = document.createElement(tag);
@@ -60,6 +27,8 @@ function createNewElement(tag, className) {
 }
 
 function createPlayer(fighter) {
+
+
   const player = createNewElement("div", "player" + fighter.player);
   const progressBar = createNewElement("div", "progressbar");
   const character = createNewElement("div", "character");
@@ -80,21 +49,7 @@ function createPlayer(fighter) {
   return player;
 }
 
-function changeHP(amount) {
-  this.hp -= amount;
 
-  if (this.hp <= 0) {
-    this.hp = 0;
-  }
-}
-
-function elHP() {
-  return document.querySelector(".player" + this.player + " .life");
-}
-
-function renderHP() {
-  this.elHP().style.width = this.hp + "%";
-}
 
 const showResult = (name) => {
   const winTitle = createNewElement("div", "loseTitle");
@@ -174,45 +129,6 @@ const playerAttack = () => {
   return attack;
 };
 
-const generateLogs = (type, player1, player2, damage, currentHP) => {
-  let text = logs[type];
-
-  switch (type) {
-    case "start":
-      text = text
-        .replace("[time]", time)
-        .replace("[player1]", player1.name)
-        .replace("[player2]", player2.name);
-      break;
-    case "hit":
-      console.log(text.length)
-      text = text[getRandom(text.length - 1)]
-        .replace("[playerKick]", player1.name)
-        .replace("[playerDefence]", player2.name);
-      text = `${time} | ${text} -${damage} [${currentHP}/100]`;
-      break;
-    case "defence":
-      text = text[getRandom(text.length - 1)]
-        .replace("[playerKick]", player1.name)
-        .replace("[playerDefence]", player2.name);
-      break;
-    case "draw":
-      text = `${time} | ${text}`;
-      break;
-    case "end":
-      text = text[getRandom(text.length - 1)]
-        .replace("[playerWins]", player1.name)
-        .replace("[playerLose]", player2.name);
-      text = `${time} | ${text}`;
-      break;
-    default:
-      text = "Игра была равна, играли два...";
-      break;
-  }
-
-  const element = `<p>${text}</p>`;
-  chat.insertAdjacentHTML("afterbegin", element);
-};
 
 const showWhoIsWin = () => {
   if (player1.hp === 0 || player2.hp === 0) {
