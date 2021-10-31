@@ -1,10 +1,10 @@
 import logs from "./log.js";
 import {chat} from './main.js'
-import { getRandom } from "./getRandom.js";
+import { getRandom } from "./utils.js";
 
 const date = new Date();
 const normalize = (number) =>
-  number.toString().length > 1 ? number : `0{number}`;
+  number.toString().length > 1 ? number : `0${number}`;
 const time = `${normalize(date.getHours())} : ${normalize(date.getMinutes())}`;
 
 const generateLogs = (type, player1, player2, damage, currentHP) => {
@@ -28,6 +28,7 @@ const generateLogs = (type, player1, player2, damage, currentHP) => {
       text = text[getRandom(text.length - 1)]
         .replace("[playerKick]", player1.name)
         .replace("[playerDefence]", player2.name);
+        text = `${time} | ${text}`;
       break;
     case "draw":
       text = `${time} | ${text}`;
@@ -39,7 +40,7 @@ const generateLogs = (type, player1, player2, damage, currentHP) => {
       text = `${time} | ${text}`;
       break;
     default:
-      text = "Игра была равна, играли два...";
+      text = `${time} Игра была равна, играли два...`;
       break;
   }
 
