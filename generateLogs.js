@@ -1,5 +1,5 @@
 import logs from "./log.js";
-import {chat} from './main.js'
+import {chat} from './arenas.js'
 import { getRandom } from "./utils.js";
 
 const date = new Date();
